@@ -24,7 +24,7 @@ HEADERS = {
 
 # Fetch the Amazon product page
 response = requests.get(URL, headers=HEADERS)
-soup = BeautifulSoup(response.content, "lxml")
+soup = BeautifulSoup(response.content, "html.parser")  # Fixed parser
 
 # Extract the product title
 title_tag = soup.find(id="productTitle")
@@ -34,18 +34,21 @@ product_title = title_tag.get_text().strip() if title_tag else "No Title Found"
 price_tag = soup.find("span", class_="a-offscreen")
 if price_tag:
     raw_price = price_tag.get_text().strip().replace("$", "").replace(",", "")
-    price = float(raw_price)
+    try:
+        price = float(raw_price)
+    except ValueError:
+        price = None
 else:
     price = None
 
 print(f"Product: {product_title}")
-print(f"Current Price: ${price if price else 'Not Found'}")
+print(f"Current Price: ${price if price is not None else 'Not Found'}")
 
 # Check price and send email alert if price is below target
-if price and price < TARGET_PRICE:
+if price is not None and price < TARGET_PRICE:
     subject = "Amazon Price Alert!"
     body = f"{product_title} is now ${price}!\nBuy now: {URL}"
-    message = f"Subject:{subject}\n\n{body}"
+    message = f"Subject: {subject}\n\n{body}"
 
     with smtplib.SMTP(SMTP_ADDRESS, port=587) as connection:
         connection.starttls()
@@ -55,5 +58,4 @@ if price and price < TARGET_PRICE:
             to_addrs=EMAIL_ADDRESS,
             msg=message.encode("utf-8")
         )
-    print("✅ Email sent!")
-    
+    print("Email sent!")
