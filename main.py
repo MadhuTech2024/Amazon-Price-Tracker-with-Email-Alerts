@@ -1,16 +1,8 @@
-import argparse
 import requests
 from bs4 import BeautifulSoup
 import smtplib
 import os
 from dotenv import load_dotenv
-
-# --- CLI Feature Start ---
-parser = argparse.ArgumentParser(description="Amazon Price Tracker")
-parser.add_argument('--url', type=str, help='Amazon product URL', required=True)
-parser.add_argument('--target', type=float, help='Target price', required=True)
-args = parser.parse_args()
-# --- CLI Feature End ---
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,9 +12,9 @@ SMTP_ADDRESS = os.getenv("SMTP_ADDRESS")
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
-# Use CLI arguments
-URL = args.url
-TARGET_PRICE = args.target
+# Prompt user for input
+URL = input("Enter the Amazon product URL: ")
+TARGET_PRICE = float(input("Enter your target price: "))
 
 # Headers to mimic a real browser
 HEADERS = {
