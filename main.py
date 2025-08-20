@@ -1,8 +1,16 @@
+import argparse
 import requests
 from bs4 import BeautifulSoup
 import smtplib
 import os
 from dotenv import load_dotenv
+
+# --- CLI Feature Start ---
+parser = argparse.ArgumentParser(description="Amazon Price Tracker")
+parser.add_argument('--url', type=str, help='Amazon product URL', required=True)
+parser.add_argument('--target', type=float, help='Target price', required=True)
+args = parser.parse_args()
+# --- CLI Feature End ---
 
 # Load environment variables from .env file
 load_dotenv()
@@ -12,9 +20,9 @@ SMTP_ADDRESS = os.getenv("SMTP_ADDRESS")
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
-# Amazon product URL and target price
-URL = "https://www.amazon.com/Sweetcrispy-Managerial-Executive-Ergonomic-Comfortable/dp/B0D3DVG3HG/"
-TARGET_PRICE = 100.00
+# Use CLI arguments
+URL = args.url
+TARGET_PRICE = args.target
 
 # Headers to mimic a real browser
 HEADERS = {
@@ -24,7 +32,7 @@ HEADERS = {
 
 # Fetch the Amazon product page
 response = requests.get(URL, headers=HEADERS)
-soup = BeautifulSoup(response.content, "html.parser")  # Fixed parser
+soup = BeautifulSoup(response.content, "html.parser")
 
 # Extract the product title
 title_tag = soup.find(id="productTitle")
