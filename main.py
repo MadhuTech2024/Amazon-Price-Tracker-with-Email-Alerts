@@ -19,7 +19,10 @@ TARGET_PRICE = float(input("Enter your target price: "))
 # Headers to mimic a real browser
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-    "Accept-Language": "en-US,en;q=0.9"
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Connection": "keep-alive",
 }
 
 # Fetch the Amazon product page
@@ -28,7 +31,7 @@ soup = BeautifulSoup(response.content, "html.parser")
 
 # Extract the product title
 title_tag = soup.find(id="productTitle")
-product_title = title_tag.get_text().strip() if title_tag else "No Title Found"
+product_title = title_tag.get_text().strip() if title_tag else None
 
 # Extract the product price
 price_tag = soup.find("span", class_="a-offscreen")
@@ -40,6 +43,11 @@ if price_tag:
         price = None
 else:
     price = None
+
+if not product_title or price is None:
+    print("Could not find product title or price. Printing a snippet of the HTML for debugging:")
+    print(response.text[:2000])  # Print the first 2000 characters of the HTML
+    product_title = product_title if product_title else "No Title Found"
 
 print(f"Product: {product_title}")
 print(f"Current Price: ${price if price is not None else 'Not Found'}")
